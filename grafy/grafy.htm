@@ -1,0 +1,697 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title></title>
+
+<style type="text/css">
+
+#chart {
+    max-width: 100%;
+    margin: 1em auto;
+}
+
+.small {
+    min-width: 350px;
+    height: 400px;
+    margin: 1em auto;
+    float: left;
+}
+
+#chartainer {
+    max-width: 100%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+</style>
+
+</head>
+<body>
+
+<div style="width: 600px; height: 300px;" id="kontakty"></div>
+
+<div style="width: 600px; height: 600px;" id="aktivity"></div>
+
+<div style="width: 600px; height: 500px;" id="obavy"></div>
+
+<div class="chartainer">
+<div class="chart small" id="vek"></div>
+<div class="chart small" id="mesto"></div>
+<div class="chart small" id="prace"></div>
+<div class="chart small" id="protekce"></div>
+</div>
+
+<div class="chart small" id="strach"></div>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+
+<script type="text/javascript">
+
+var colors = ['#b80058','#ebac23','#008cf9','#006e00','#00bbad','#d163e6','#b24502','#ff9287', '#5954d6', '#00c6f8', '#878500', '#00a76c', '#bdbdbd'];
+
+var tydny = ['1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.'];
+
+var kontakty_data = [19, 14.4, 7.3, 6.4, 8.2, 8.3, 10.1, 10.3];
+
+var aktivity_data = [
+  [35.8,27.6,14.1,10,14.9,12.7,15.2,14.6],
+  [82.1,73.7,72.6,67.2,71,67.2,71,71.1],
+  [79.4,68.3,62.3,51.5,55.8,52,61.6,58.2],
+  [30.9,19,3,0.9,1.6,1.8,2.6,2.7],
+  [26.9,19.8,13.1,9.6,12.1,10.2,13,13.3],
+  [59.4,46.6,39.6,32.8,39.9,40,47.1,47.9],
+  [6.4,4.7,2,1.9,4,3.5,5.9,6.4],
+  [8,2.3,0,0,0,0,0,0],
+  [2.9,1.3,0,0,0,0,0,0],
+  [12.7,6.4,1.1,0.6,1.4,1.4,1.9,2.3],
+  [16.3,8.7,4.5,2.8,3.7,2.4,4.4,4.5],
+  [4.1,2.5,1.4,0.7,1.3,1.6,1.5,1.5],
+  [null,null,16.9,12.3,16.9,13.6,23,19.8],
+  [null,null,4.5,3.5,6.7,6.1,9.7,8.1]
+];
+
+var aktivity_popis = [
+'Jízda MHD, vlakem nebo autobusem',
+'Návštěva obchodu/banky/pošty s větším množstvím lidí',
+'Nakupování nebalených potravin',
+'Návštěva restaurace/hospody',
+'Návštěva lékaře/zdravotních a sociálních institucí',
+'Návštěva rodiny či přátel',
+'Společná dovolená či výlet s více lidmi',
+'Návštěva sportovních/kulturních akcí do 500 lidí',
+'Návštěva sportovních/kulturních akcí nad 500 lidí',
+'Návštěva fitness/sportovišť',
+'Využití veřejných toalet',
+'Jízda taxi',
+'Procházky ve více než dvou lidech',
+'Pobyt na chatě/chalupě'
+];
+
+var segmenty_data = [
+  [22.3,16.2,8.3,7.3,9.3,10,11.8,12.4],
+  [24.9,19.9,9.6,8.6,10.9,10.5,13.0,13.1],
+  [11.6,8.4,4.4,3.8,5.0,5.4,6.4,6.6],
+  [19.3,14.8,7.7,6.8,9.1,9.1,10.7,10.6],
+  [19.3,14.5,7.0,6.1,6.9,7.3,9.7,10.4],
+  [18.3,13.5,6.7,5.8,7.3,7.5,8.9,9.8],
+  [26.8,23.0,13.9,13.9,16.4,17.5,18.3,19.1],
+  [17.5,7.1,5.5,3.7,4.7,4.4,6.2,6.8],
+  [9.2,5.9,4.0,2.9,4.6,4.4,5.8,5.8],
+  [20.1,15.4,7.7,7.2,8.1,8.4,13.1,12.6],
+  [19.8,15.0,7.2,6.6,8.9,9.6,10.4,11.0],
+  [18.0,13.6,7.2,6.1,7.7,7.4,8.5,8.9],
+  [20.7,15.2,8.2,7.2,8.6,8.5,11.4,12.1],
+  [18.5,14.5,7.2,7.1,8.9,9.0,9.8,10.1],
+  [18.6,14.0,7.1,5.7,7.2,7.6,9.4,9.4]
+];
+
+var segmenty_popis = [
+'18 až 34 let',
+'35 až 54 let',
+'nad 55 let',
+'do 20 tisíc',
+'20 až 100 tisíc',
+'nad 100 tisíc',
+'přítomen v práci',
+'práce z domu',
+'bez práce',
+'0–5 aktivit',
+'6–9 aktivit',
+'10+ aktivit',
+'nízká míra',
+'střední míra',
+'vysoká míra'
+];
+
+var obavy_data = [
+  [21.5,21.5,15.7,15.7,19.9,19.9,23.3,23.3],
+  [28.5,28.5,34.1,34.1,42,42,46.4,46.4],
+  [50,50,50.2,50.2,38.1,38.1,30.3,30.3]
+]
+
+Highcharts.chart('kontakty', {
+    chart: {
+        type: 'line'
+    },
+
+    title: {
+        text: 'Průměrný počet týdenních fyzických kontaktů'
+    },
+
+    subtitle: {
+        text: 'První týden v grafech odpovídá datu 2.–8. března, poslední týden 20.–26. dubnu'
+    },
+
+    xAxis: {
+        categories: tydny,
+        title: {
+            text: 'týden nouzového stavu'
+        }
+    },
+
+    yAxis: {
+        title: {
+            text: ''
+        },
+        labels: {
+            enabled: false
+        }
+    },
+
+    tooltip: {
+        headerFormat: '<span style="font-size: 10px">{point.key} týden</span><br/>'
+    },
+
+    exporting: {
+        enabled: false
+    },
+
+    legend: {
+        enabled: false
+    },
+
+    credits: {
+        enabled: false
+    },
+
+    series: [{
+        name: 'Týdenní kontakty',
+        data: kontakty_data,
+        color: colors[7]
+    }]
+});
+
+Highcharts.chart('obavy', {
+    chart: {
+        type: 'line'
+    },
+
+    title: {
+        text: 'Obavy z koronaviru'
+    },
+
+    xAxis: {
+        categories: tydny,
+        title: {
+            text: 'týden nouzového stavu'
+        }
+    },
+
+    yAxis: {
+        title: {
+            text: 'podíl populace',
+        },
+        labels: {
+            format: '{value} %'
+        },
+        min: 0
+    },
+
+    tooltip: {
+        headerFormat: '<span style="font-size: 10px">{point.key} týden</span><br/>',
+        valueSuffix: ' %'
+    },
+
+    exporting: {
+        enabled: false
+    },
+
+    credits: {
+        enabled: false
+    },
+
+    plotOptions: {
+        line: {
+            marker: {
+                symbol: 'circle'
+            }
+        }
+    },
+
+    series: [{
+        name: 'Vysoká míra obav',
+        data: obavy_data[2],
+        color: colors[0]
+    }, {
+        name: 'Střední míra obav',
+        data: obavy_data[1],
+        color: colors[1]
+    }, {
+        name: 'Nízká míra obav',
+        data: obavy_data[0],
+        color: colors[2]
+    }]
+});
+
+Highcharts.chart('aktivity', {
+    chart: {
+        type: 'line'
+    },
+
+    title: {
+        text: 'Aktivity nejméně 1× týdně'
+    },
+
+    xAxis: {
+        categories: tydny,
+        title: {
+            text: 'týden nouzového stavu'
+        }
+    },
+
+    yAxis: {
+        title: {
+            text: 'podíl populace',
+        },
+        labels: {
+            format: '{value} %'
+        },
+        min: 0
+    },
+
+    tooltip: {
+        headerFormat: '<span style="font-size: 10px">{point.key} týden</span><br/>',
+        valueSuffix: ' %'
+    },
+
+    exporting: {
+        enabled: false
+    },
+
+    credits: {
+        text: 'PAQ Research'
+    },
+
+    plotOptions: {
+        line: {
+            marker: {
+                symbol: 'circle'
+            }
+        }
+    },
+
+    series: [{
+        name: aktivity_popis[0],
+        data: aktivity_data[0],
+        color: colors[0]
+    }, {
+        name: aktivity_popis[1],
+        data: aktivity_data[1],
+        color: colors[5],
+        visible: false
+    }, {
+        name: aktivity_popis[2],
+        data: aktivity_data[2],
+        color: colors[2],
+        visible: false
+    }, {
+        name: aktivity_popis[3],
+        data: aktivity_data[3],
+        color: colors[6],
+        visible: false
+    }, {
+        name: aktivity_popis[4],
+        data: aktivity_data[4],
+        color: colors[4],
+        visible: false
+    }, {
+        name: aktivity_popis[5],
+        data: aktivity_data[5],
+        color: colors[1]
+    }, {
+        name: aktivity_popis[6],
+        data: aktivity_data[6],
+        color: colors[3]
+    }, {
+        name: aktivity_popis[7],
+        data: aktivity_data[7],
+        color: colors[7],
+        visible: false
+    }, {
+        name: aktivity_popis[8],
+        data: aktivity_data[8],
+        color: colors[8],
+        visible: false
+    }, {
+        name: aktivity_popis[9],
+        data: aktivity_data[9],
+        color: colors[9]
+    }, {
+        name: aktivity_popis[10],
+        data: aktivity_data[10],
+        color: colors[10],
+        visible: false
+    }, {
+        name: aktivity_popis[11],
+        data: aktivity_data[11],
+        color: colors[11],
+        visible: false
+    }, {
+        name: aktivity_popis[12],
+        data: aktivity_data[12],
+        color: '#666'
+    }, {
+        name: aktivity_popis[13],
+        data: aktivity_data[13],
+        color: colors[13],
+        visible: false
+    }]
+});
+
+Highcharts.chart('vek', {
+    chart: {
+        type: 'line'
+    },
+
+    title: {
+        text: 'Věk'
+    },
+
+    xAxis: {
+        categories: tydny,
+        title: {
+            text: ''
+        }
+    },
+
+    yAxis: {
+        title: {
+            text: ''
+        },
+        labels: {
+            enabled: false
+        },
+        min: 0,
+        max: 25
+    },
+
+    tooltip: {
+        headerFormat: '<span style="font-size: 10px">{point.key} týden</span><br/>'
+    },
+
+    exporting: {
+        enabled: false
+    },
+
+    credits: {
+        enabled: false
+    },
+
+    plotOptions: {
+        line: {
+            marker: {
+                symbol: 'circle'
+            }
+        }
+    },
+
+    legend: {
+        layout: 'vertical'
+    },
+
+    series: [{
+        name: segmenty_popis[0],
+        data: segmenty_data[0],
+        color: colors[0]
+    }, {
+        name: segmenty_popis[1],
+        data: segmenty_data[1],
+        color: colors[1]
+    }, {
+        name: segmenty_popis[2],
+        data: segmenty_data[2],
+        color: colors[2]
+    }]
+});
+
+Highcharts.chart('mesto', {
+    chart: {
+        type: 'line'
+    },
+
+    title: {
+        text: 'Velikost bydliště'
+    },
+
+    xAxis: {
+        categories: tydny,
+        title: {
+            text: ''
+        }
+    },
+
+    yAxis: {
+        title: {
+            text: ''
+        },
+        labels: {
+            enabled: false
+        },
+        min: 0,
+        max: 25
+    },
+
+    tooltip: {
+        headerFormat: '<span style="font-size: 10px">{point.key} týden</span><br/>'
+    },
+
+    exporting: {
+        enabled: false
+    },
+
+    credits: {
+        enabled: false
+    },
+
+    plotOptions: {
+        line: {
+            marker: {
+                symbol: 'circle'
+            }
+        }
+    },
+
+    legend: {
+        layout: 'vertical'
+    },
+
+    series: [{
+        name: segmenty_popis[3],
+        data: segmenty_data[3],
+        color: colors[0]
+    }, {
+        name: segmenty_popis[4],
+        data: segmenty_data[4],
+        color: colors[1]
+    }, {
+        name: segmenty_popis[5],
+        data: segmenty_data[5],
+        color: colors[2]
+    }]
+});
+
+Highcharts.chart('prace', {
+    chart: {
+        type: 'line'
+    },
+
+    title: {
+        text: 'Typ práce'
+    },
+
+    xAxis: {
+        categories: tydny,
+        title: {
+            text: ''
+        }
+    },
+
+    yAxis: {
+        title: {
+            text: ''
+        },
+        labels: {
+            enabled: false
+        },
+        min: 0,
+        max: 25
+    },
+
+    tooltip: {
+        headerFormat: '<span style="font-size: 10px">{point.key} týden</span><br/>'
+    },
+
+    exporting: {
+        enabled: false
+    },
+
+    credits: {
+        enabled: false
+    },
+
+    legend: {
+        layout: 'vertical'
+    },
+
+    plotOptions: {
+        line: {
+            marker: {
+                symbol: 'circle'
+            }
+        }
+    },
+
+    series: [{
+        name: segmenty_popis[6],
+        data: segmenty_data[6],
+        color: colors[0]
+    }, {
+        name: segmenty_popis[7],
+        data: segmenty_data[7],
+        color: colors[1]
+    }, {
+        name: segmenty_popis[8],
+        data: segmenty_data[8],
+        color: colors[2]
+    }]
+});
+
+Highcharts.chart('protekce', {
+    chart: {
+        type: 'line'
+    },
+
+    title: {
+        text: 'Protektivní aktivity'
+    },
+
+    xAxis: {
+        categories: tydny,
+        title: {
+            text: ''
+        }
+    },
+
+    yAxis: {
+        title: {
+            text: ''
+        },
+        labels: {
+            enabled: false
+        },
+        min: 0,
+        max: 25
+    },
+
+    tooltip: {
+        headerFormat: '<span style="font-size: 10px">{point.key} týden</span><br/>'
+    },
+
+    exporting: {
+        enabled: false
+    },
+
+    credits: {
+        enabled: false
+    },
+
+    plotOptions: {
+        line: {
+            marker: {
+                symbol: 'circle'
+            }
+        }
+    },
+
+    legend: {
+        layout: 'vertical'
+    },
+
+    series: [{
+        name: segmenty_popis[9],
+        data: segmenty_data[9],
+        color: colors[0]
+    }, {
+        name: segmenty_popis[10],
+        data: segmenty_data[10],
+        color: colors[1]
+    }, {
+        name: segmenty_popis[11],
+        data: segmenty_data[8],
+        color: colors[2]
+    }]
+});
+
+Highcharts.chart('strach', {
+    chart: {
+        type: 'line'
+    },
+
+    title: {
+        text: 'Obavy'
+    },
+
+    xAxis: {
+        categories: tydny,
+        title: {
+            text: ''
+        }
+    },
+
+    yAxis: {
+        title: {
+            text: ''
+        },
+        labels: {
+            enabled: false
+        },
+        min: 0,
+        max: 25
+    },
+
+    tooltip: {
+        headerFormat: '<span style="font-size: 10px">{point.key} týden</span><br/>'
+    },
+
+    exporting: {
+        enabled: false
+    },
+
+    credits: {
+        enabled: false
+    },
+
+    plotOptions: {
+        line: {
+            marker: {
+                symbol: 'circle'
+            }
+        }
+    },
+
+    legend: {
+        layout: 'vertical'
+    },
+
+    series: [{
+        name: segmenty_popis[12],
+        data: segmenty_data[12],
+        color: colors[0]
+    }, {
+        name: segmenty_popis[13],
+        data: segmenty_data[13],
+        color: colors[1]
+    }, {
+        name: segmenty_popis[14],
+        data: segmenty_data[14],
+        color: colors[2]
+    }]
+});
+
+</script>
+</html>
